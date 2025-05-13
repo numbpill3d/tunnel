@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abandoned Metro | Personal Site</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            overflow: hidden;
+            background-color: #000;
+            color: #ddd;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #content {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            pointer-events: none;
+        }
+
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            padding: 20px;
+        }
+
+        #title {
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(255, 50, 50, 0.7);
+            pointer-events: auto;
+        }
+
+        #navbar {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 10px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .nav-item:hover {
+            background: rgba(40, 40, 40, 0.8);
+            text-shadow: 0 0 5px #f55;
+        }
+
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .content-container {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #333;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 70vh;
+            overflow: auto;
+            pointer-events: auto;
+        }
+
+        .content-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            text-shadow: 0 0 5px rgba(255, 100, 100, 0.5);
+        }
+
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        #loading-bar {
+            width: 200px;
+            height: 10px;
+            background: #111;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        #loading-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f55, #55f);
+            transition: width 0.3s ease;
+        }
+
+        .blink {
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        #footer {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            width: 100%;
+            pointer-events: auto;
+        }
+
+        .ascii-social {
+            margin: 0 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ascii-social:hover {
+            text-shadow: 0 0 5px #f55;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            #header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            #navbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .content-container {
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <h1 class="blink">[SYSTEM BOOTING]</h1>
+        <div id="loading-bar">
+            <div id="loading-progress"></div>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <div id="content">
+        <div id="header">
+            <div id="title">>_ TRANSIT_TERMINAL</div>
+            <div id="navbar">
+                <div class="nav-item" data-page="home">>_ HOME</div>
+                <div class="nav-item" data-page="about">>_ ABOUT</div>
+                <div class="nav-item" data-page="projects">>_ PROJECTS</div>
+                <div class="nav-item" data-page="contact">>_ CONTACT</div>
+            </div>
+        </div>
+
+        <div id="main-content">
+            <div class="content-container" id="home-content">
+                <div class="content-title">>_ WELCOME TO THE SYSTEM</div>
+                <p>You've accessed the abandoned terminal of [YOUR_NAME].</p>
+                <p>This station was once a bustling hub of activity, now repurposed as a digital sanctuary.</p>
+                <p>Navigate through the tunnels to discover more about my work, projects, and how to reach me.</p>
+                <p>The graffiti tells a story - my story. The flickering lights guide your way.</p>
+                <br>
+                <p class="blink">>_ SYSTEM STATUS: ONLINE</p>
+            </div>
+
+            <div class="content-container" id="about-content" style="display: none;">
+                <div class="content-title">>_ SYSTEM OPERATOR PROFILE</div>
+                <p>Identity: [YOUR_NAME]</p>
+                <p>Occupation: [YOUR_OCCUPATION]</p>
+                <br>
+                <p>I am a digital explorer, navigating the underground networks of the web.</p>
+                <p>With expertise in [YOUR_SKILLS], I create and secure digital experiences.</p>
+                <p>This abandoned station represents my journey - repurposing the forgotten to build something new.</p>
+                <br>
+                <p>The graffiti you see? Each piece represents a skill, a project, a milestone in my journey.</p>
+            </div>
+
+            <div class="content-container" id="projects-content" style="display: none;">
+                <div class="content-title">>_ ARCHIVED OPERATIONS</div>
+                <div class="project">
+                    <h3>>_ PROJECT_ALPHA</h3>
+                    <p>[PROJECT_DESCRIPTION]</p>
+                    <p>Technology used: [TECH_STACK]</p>
+                </div>
+                <br>
+                <div class="project">
+                    <h3>>_ PROJECT_BETA</h3>
+                    <p>[PROJECT_DESCRIPTION]</p>
+                    <p>Technology used: [TECH_STACK]</p>
+                </div>
+                <br>
+                <div class="project">
+                    <h3>>_ PROJECT_GAMMA</h3>
+                    <p>[PROJECT_DESCRIPTION]</p>
+                    <p>Technology used: [TECH_STACK]</p>
+                </div>
+            </div>
+
+            <div class="content-container" id="contact-content" style="display: none;">
+                <div class="content-title">>_ COMMUNICATION_CHANNELS</div>
+                <p>>_ EMAIL: [YOUR_EMAIL]</p>
+                <p>>_ LOCATION: [YOUR_LOCATION]</p>
+                <br>
+                <p>To establish secure communication, use the following protocols:</p>
+                <p>1. State your identity</p>
+                <p>2. Declare your intent</p>
+                <p>3. Provide communication timestamp</p>
+                <br>
+                <p class="blink">>_ AWAITING TRANSMISSION...</p>
+            </div>
+        </div>
+
+        <div id="footer">
+            <div class="ascii-social">[#]</div>
+            <div class="ascii-social">[@]</div>
+            <div class="ascii-social">[&]</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Main variables
+        let scene, camera, renderer, clock;
+        let station, walls = [], lights = [], currentPage = 'home';
+        let tunnelEffect = { active: false, progress: 0, targetPage: '' };
+        let tunnel, tunnelSegments = 20;
+        let isTransitioning = false;
+        let raycaster, mouse, intersects;
+        let mixer, animations = {};
+        let graffiti = [
+            { position: [10, 1, 0], rotation: [0, -Math.PI/2, 0], scale: [6, 3, 1] },
+            { position: [-10, 1, 0], rotation: [0, Math.PI/2, 0], scale: [6, 3, 1] },
+            { position: [0, 1, 10], rotation: [0, 0, 0], scale: [6, 3, 1] },
+            { position: [0, 1, -10], rotation: [0, Math.PI, 0], scale: [6, 3, 1] }
+        ];
+
+        // Load manager to track progress
+        const loadManager = new THREE.LoadingManager();
+        const textureLoader = new THREE.TextureLoader(loadManager);
+        let totalAssets = 7; // Adjust based on actual number of assets
+        let loadedAssets = 0;
+
+        loadManager.onProgress = function(url, itemsLoaded, itemsTotal) {
+            loadedAssets++;
+            const progress = Math.floor((loadedAssets / totalAssets) * 100);
+            document.getElementById('loading-progress').style.width = progress + '%';
+        };
+
+        loadManager.onLoad = function() {
+            setTimeout(() => {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content').style.opacity = '1';
+                    showPage('home');
+                }, 500);
+            }, 1000);
+        };
+
+        // Initialize the scene
+        function init() {
+            // Clock for animations
+            clock = new THREE.Clock();
+
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.05);
+
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.6, 5);
+
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Ambient light for base illumination
+            const ambientLight = new THREE.AmbientLight(0x222222);
+            scene.add(ambientLight);
+
+            createStation();
+            createLights();
+            createTunnel();
+            setupEventListeners();
+
+            animate();
+        }
+
+        // Create the metro station
+        function createStation() {
+            station = new THREE.Group();
+            scene.add(station);
+
+            // Floor
+            const floorTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/brick_diffuse.jpg');
+            floorTexture.wrapS = THREE.RepeatWrapping;
+            floorTexture.wrapT = THREE.RepeatWrapping;
+            floorTexture.repeat.set(5, 5);
+            
+            const floorMaterial = new THREE.MeshStandardMaterial({ 
+                map: floorTexture, 
+                roughness: 0.8,
+                metalness: 0.2
+            });
+            
+            const floorGeometry = new THREE.PlaneGeometry(30, 30);
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            station.add(floor);
+
+            // Ceiling
+            const ceilingTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/hardwood2_diffuse.jpg');
+            ceilingTexture.wrapS = THREE.RepeatWrapping;
+            ceilingTexture.wrapT = THREE.RepeatWrapping;
+            ceilingTexture.repeat.set(3, 3);
+            
+            const ceilingMaterial = new THREE.MeshStandardMaterial({ 
+                map: ceilingTexture,
+                roughness: 0.7,
+                metalness: 0.3
+            });
+            
+            const ceilingGeometry = new THREE.PlaneGeometry(30, 30);
+            const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
+            ceiling.rotation.x = Math.PI / 2;
+            ceiling.position.y = 4;
+            ceiling.receiveShadow = true;
+            station.add(ceiling);
+            
+            // Create graffiti-covered walls
+            const graffitiTextures = [
+                textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/brick_diffuse.jpg'),
+                textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/brick_diffuse.jpg'),
+                textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/brick_diffuse.jpg'),
+                textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/brick_diffuse.jpg')
+            ];
+            
+            graffiti.forEach((wall, index) => {
+                const wallMaterial = new THREE.MeshStandardMaterial({
+                    map: graffitiTextures[index % graffitiTextures.length],
+                    roughness: 0.8,
+                    metalness: 0.2
+                });
+                
+                const wallGeometry = new THREE.BoxGeometry(0.2, 4, 6);
+                const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+                
+                wallMesh.position.set(wall.position[0], wall.position[1], wall.position[2]);
+                wallMesh.rotation.set(wall.rotation[0], wall.rotation[1], wall.rotation[2]);
+                wallMesh.scale.set(wall.scale[0], wall.scale[1], wall.scale[2]);
+                
+                wallMesh.castShadow = true;
+                wallMesh.receiveShadow = true;
+                
+                walls.push(wallMesh);
+                station.add(wallMesh);
+            });
+
+            // Add some station props
+            addStationProps();
+        }
+
+        // Add some props to make the station look more realistic
+        function addStationProps() {
+            // Platform
+            const platformGeometry = new THREE.BoxGeometry(20, 0.5, 3);
+            const platformMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+            platform.position.set(0, 0.25, -5);
+            platform.castShadow = true;
+            platform.receiveShadow = true;
+            station.add(platform);
+
+            // Track bed
+            const trackBedGeometry = new THREE.BoxGeometry(20, 0.1, 1);
+            const trackBedMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            const trackBed = new THREE.Mesh(trackBedGeometry, trackBedMaterial);
+            trackBed.position.set(0, 0.05, -7);
+            station.add(trackBed);
+
+            // Rails
+            const railGeometry = new THREE.BoxGeometry(20, 0.05, 0.1);
+            const railMaterial = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.8 });
+            
+            const rail1 = new THREE.Mesh(railGeometry, railMaterial);
+            rail1.position.set(0, 0.1, -6.8);
+            station.add(rail1);
+            
+            const rail2 = new THREE.Mesh(railGeometry, railMaterial);
+            rail2.position.set(0, 0.1, -7.2);
+            station.add(rail2);
+
+            // Pillars
+            const pillarGeometry = new THREE.CylinderGeometry(0.2, 0.2, 4, 8);
+            const pillarMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
+            
+            for (let i = -8; i <= 8; i += 4) {
+                const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
+                pillar.position.set(i, 2, -5);
+                pillar.castShadow = true;
+                station.add(pillar);
+            }
+
+            // Ceiling fixtures
+            const fixtureGeometry = new THREE.BoxGeometry(0.5, 0.1, 0.5);
+            const fixtureMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            
+            for (let i = -6; i <= 6; i += 3) {
+                const fixture = new THREE.Mesh(fixtureGeometry, fixtureMaterial);
+                fixture.position.set(i, 3.95, 0);
+                station.add(fixture);
+            }
+        }
+
+        // Create flickering lights
+        function createLights() {
+            // Create several point lights
+            const lightPositions = [
+                [-6, 3.8, 0],
+                [-3, 3.8, 0],
+                [0, 3.8, 0],
+                [3, 3.8, 0],
+                [6, 3.8, 0]
+            ];
+
+            lightPositions.forEach(pos => {
+                // Light fixture
+                const pointLight = new THREE.PointLight(0xffffcc, 1, 10, 2);
+                pointLight.position.set(pos[0], pos[1], pos[2]);
+                pointLight.castShadow = true;
+                
+                // Set random flicker parameters
+                pointLight.userData = {
+                    baseIntensity: 1,
+                    flickerSpeed: 0.1 + Math.random() * 0.3,
+                    flickerIntensity: 0.3 + Math.random() * 0.5,
+                    time: Math.random() * 1000
+                };
+                
+                lights.push(pointLight);
+                scene.add(pointLight);
+                
+                // Add light helper sphere
+                const sphereGeometry = new THREE.SphereGeometry(0.1, 16, 8);
+                const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffcc });
+                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                sphere.position.copy(pointLight.position);
+                scene.add(sphere);
+            });
+        }
+
+        // Create tunnel for transitions
+        function createTunnel() {
+            tunnel = new THREE.Group();
+            tunnel.visible = false;
+            scene.add(tunnel);
+            
+            const tunnelLength = 30;
+            const tunnelRadius = 2;
+            const segments = tunnelSegments;
+            
+            for (let i = 0; i < segments; i++) {
+                const segmentGeometry = new THREE.TorusGeometry(tunnelRadius, 0.1, 8, 20);
+                const segmentMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x444444,
+                    transparent: true,
+                    opacity: 1 - (i / segments)
+                });
+                
+                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                segment.position.z = -(i * (tunnelLength / segments));
+                tunnel.add(segment);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // Navigation click handlers
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const page = item.getAttribute('data-page');
+                    if (currentPage !== page && !isTransitioning) {
+                        startTunnelTransition(page);
+                    }
+                });
+            });
+
+            // Mobile responsive adjustments
+            if (window.innerWidth <= 768) {
+                camera.position.z = 8; // Move camera back for mobile
+            }
+        }
+
+        // Start tunnel transition animation
+        function startTunnelTransition(targetPage) {
+            isTransitioning = true;
+            tunnelEffect.active = true;
+            tunnelEffect.progress = 0;
+            tunnelEffect.targetPage = targetPage;
+            
+            tunnel.visible = true;
+            tunnel.position.copy(camera.position);
+            tunnel.rotation.copy(camera.rotation);
+        }
+
+        // Show the specified page content
+        function showPage(page) {
+            currentPage = page;
+            
+            document.querySelectorAll('.content-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            document.getElementById(`${page}-content`).style.display = 'block';
+        }
+
+        // Update flickering lights
+        function updateLights(delta) {
+            lights.forEach(light => {
+                const userData = light.userData;
+                userData.time += delta * userData.flickerSpeed;
+                
+                // Generate flicker effect with noise
+                const noise = Math.sin(userData.time * 10) * 0.5 + 0.5;
+                const flicker = userData.baseIntensity - (noise * userData.flickerIntensity);
+                
+                light.intensity = flicker;
+            });
+        }
+
+        // Update tunnel transition effect
+        function updateTunnelEffect(delta) {
+            if (tunnelEffect.active) {
+                tunnelEffect.progress += delta * 0.5; // Adjust speed here
+                
+                if (tunnelEffect.progress >= 1) {
+                    tunnelEffect.active = false;
+                    tunnel.visible = false;
+                    showPage(tunnelEffect.targetPage);
+                    isTransitioning = false;
+                } else {
+                    // Move camera forward through tunnel
+                    camera.position.z = 5 - (tunnelEffect.progress * 30);
+                    
+                    // Fade content in/out based on progress
+                    if (tunnelEffect.progress < 0.5) {
+                        document.getElementById('main-content').style.opacity = 1 - (tunnelEffect.progress * 2);
+                    } else {
+                        document.getElementById('main-content').style.opacity = (tunnelEffect.progress - 0.5) * 2;
+                    }
+                }
+            } else if (!isTransitioning) {
+                // Reset camera position when not transitioning
+                const targetZ = window.innerWidth <= 768 ? 8 : 5;
+                camera.position.z += (targetZ - camera.position.z) * 0.05;
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            
+            updateLights(delta);
+            updateTunnelEffect(delta);
+            
+            // Rotate the station slightly for ambient movement
+            if (station && !isTransitioning) {
+                station.rotation.y += delta * 0.05;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // Simulate loading progress for demo
+        let loadingInterval = setInterval(() => {
+            loadedAssets++;
+            const progress = Math.floor((loadedAssets / totalAssets) * 100);
+            document.getElementById('loading-progress').style.width = progress + '%';
+            
+            if (loadedAssets >= totalAssets) {
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    document.getElementById('loading').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('main-content').style.opacity = '1';
+                        showPage('home');
+                    }, 500);
+                }, 1000);
+            }
+        }, 500);
+
+        // Initialize everything
+        init();
+    </script>
+</body>
+</html>
